@@ -41,4 +41,15 @@ generate (App e1 e2) = do
  alpha <- freshMeta
  return (alpha, [CEq e1t (TFun alpha e2t)] ++ e1f ++ e2f)
 
+generate (LetA name dect e1 e2) = do
+ (e1t, e1f) <- withType name dect $ generate e1
+ (e2t, e2f) <- withType name dect $ generate e2
+ constrs <- case dect of
+  (TForall vars contrs tau) -> do
+    assert (contrs == [])
+    fuv <- getFuv
+    return $ [CImp fuv vars [] ([(CEq tau e1t)] ++ e1f)] ++ e2f
+  _ -> return $ [CEq dect e1t] ++ e1f ++ e2f
+ return (e2t, constrs)
+
 generate _ = undefined

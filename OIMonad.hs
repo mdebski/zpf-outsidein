@@ -11,14 +11,16 @@ import OIDefs
 data OIState = OIState {
  nextVar :: Int,
  nextMeta :: Int,
- env :: Map.Map Name OIType
+ env :: Map.Map Name OIType,
+ fuv :: [[MetaVar]]
 } deriving (Eq, Show)
 
 baseState :: OIState
 baseState = OIState{
  nextVar = 100,
  nextMeta = 0,
- env = Map.empty
+ env = Map.empty,
+ fuv = [[]]
 }
 
 type OI = (StateT OIState) IO
@@ -31,8 +33,8 @@ freshVar = do
 
 freshMeta :: OI OIType
 freshMeta = do
- state@OIState{nextMeta=nextMeta} <- get
- put state{nextMeta = nextMeta+1}
+ state@OIState{nextMeta=nextMeta,fuv=(f:fs)} <- get
+ put state{nextMeta=nextMeta+1,fuv=((nextMeta:f):fs)}
  return $ TMeta nextMeta
 
 getType :: Name -> OI OIType
@@ -42,11 +44,16 @@ getType name = do
 
 withType :: Name -> OIType -> OI a -> OI a
 withType n t m = do
- state@OIState{env=env} <- get
- put state{env=Map.insert n t env}
+ state@OIState{env=env, fuv=fuv} <- get
+ put state{env=Map.insert n t env, fuv=[]:fuv}
  res <- m
- put state{env=env}
+ put state{env=env, fuv=fuv}
  return res
+
+getFuv :: OI [MetaVar]
+getFuv = do
+ OIState{fuv=fuv} <- get
+ return $ concat fuv
 
 assert :: Bool -> OI ()
 assert b = void $ return $ Exc.assert b ()
