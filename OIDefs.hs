@@ -1,23 +1,22 @@
 module OIDefs where
 
-type VName = String
-type TName = String
+type Name = String
 
 data OIExpr =
    ILit Int
  | BLit Bool
- | Con TName
- | Var VName
- | Lam VName OIExpr
+ | Con Name
+ | Var Name
+ | Lam Name OIExpr
  | App OIExpr OIExpr
- | Let VName OIExpr OIExpr
- | LetA VName OIType OIExpr OIExpr
+ | Let Name OIExpr OIExpr
+ | LetA Name OIType OIExpr OIExpr
  | Case OIExpr [(OIPat, OIExpr)]
  deriving (Eq, Show)
 
 data OIPat =
-   PVar VName
- | PCon TName [OIPat]
+   PVar Name
+ | PCon Name [OIPat]
  deriving (Eq, Show)
 
 type TypeVar = Int
@@ -27,12 +26,13 @@ data OIType =
    TInt
  | TBool
  | TFun OIType OIType
- | TCons TName [OIType]
+ | TCons Name [OIType]
  | TVar TypeVar
  | TMeta MetaVar
- | TForall [TypeVar] OIType
+ | TForall [TypeVar] [OIConstraint] OIType
  deriving (Eq, Show)
 
 data OIConstraint =
    CEq OIType OIType
  | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]
+ deriving (Eq, Show)
