@@ -23,22 +23,30 @@ baseState = OIState{
 
 type OI = (StateT OIState) IO
 
-freshVar :: OI TypeVar
+freshVar :: OI OIType
 freshVar = do
  state@OIState{nextVar=nextVar} <- get
  put state{nextVar = nextVar+1}
- return nextVar
+ return $ TVar nextVar
 
-freshMeta :: OI MetaVar
+freshMeta :: OI OIType
 freshMeta = do
  state@OIState{nextMeta=nextMeta} <- get
  put state{nextMeta = nextMeta+1}
- return nextMeta
+ return $ TMeta nextMeta
 
 getType :: Name -> OI OIType
 getType name = do
  OIState{env=env} <- get
  return $ env Map.! name
+
+withType :: Name -> OIType -> OI a -> OI a
+withType n t m = do
+ state@OIState{env=env} <- get
+ put state{env=Map.insert n t env}
+ res <- m
+ put state{env=env}
+ return res
 
 assert :: Bool -> OI ()
 assert b = void $ return $ Exc.assert b ()

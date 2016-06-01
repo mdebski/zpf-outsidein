@@ -12,3 +12,6 @@ makeSub = undefined
 
 applySub :: Sub -> OIType -> OIType
 applySub = undefined
+
+applySubC :: Sub -> [OIConstraint] -> [OIConstraint]
+applySubC = undefined
