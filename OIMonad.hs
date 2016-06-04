@@ -3,7 +3,7 @@ module OIMonad where
 import Control.Monad
 import qualified Data.Map as Map
 import qualified Control.Exception.Base as Exc
-import Control.Monad.Trans.State (StateT, put, get)
+import Control.Monad.Trans.State (StateT, put, get, runStateT)
 
 
 import OIDefs
@@ -37,6 +37,8 @@ baseState = OIState{
 }
 
 type OI = (StateT OIState) IO
+runOI :: OI a -> IO (a, OIState)
+runOI m = runStateT m baseState
 
 freshVar :: OI OIType
 freshVar = do
@@ -84,16 +86,3 @@ getEnvFuv = do
  OIState{envs=envs} <- get
  let env = Map.unions envs
  return $ concatMap fuv (Map.elems env)
-
-fuv :: OIType -> [MetaVar]
-fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
-fuv (TCons _ ts) = concat (map fuv ts)
-fuv (TForall _ _ t) = fuv t
-fuv (TMeta m) = [m]
-fuv _ = []
-
---worker :: OIType -> a
---joiner :: a -> a -> a
---
---foldType :: OIType -> (worker) -> (joiner) -> a
---foldType (TFun t1 t2) = joiner (worker t1) (worker t2)

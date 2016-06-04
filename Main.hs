@@ -1,4 +1,5 @@
 import OIDefs
+import OIMonad
 import ConGen
 
 stdlib :: OIExpr -> OIExpr
@@ -35,4 +36,8 @@ expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  , (PCon "T2" ["a"], App (Var "not") (Var "x"))
  ]) (ILit 42)
 
-main = print $ expr1
+main = do
+ print expr1
+ ((t, fs), state) <- runOI $ generate expr1
+ print t
+ print fs

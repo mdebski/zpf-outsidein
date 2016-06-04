@@ -25,8 +25,10 @@ applySub s t = t
 
 applySubC :: Sub -> OIConstraint -> OIConstraint
 applySubC s (CEq t1 t2) = CEq (applySub s t1) (applySub s t2)
-applySubC s (CImp metas tvars cs1 cs2) = CImp metas tvars cs1' cs2' where
- untouch = Set.fromList $ (map SMeta metas) ++ (map SVar tvars)
- (s', _) = Map.partitionWithKey (\subvar -> \_ -> Set.member subvar untouch) s
- cs1' = (map (applySubC s') cs1)
- cs2' = (map (applySubC s') cs2)
+applySubC s (CImp metas tvars cs1 cs2) = CImp metas' tvars cs1' cs2' where
+ metas' = concatMap fuv (map (applySub s) (map TMeta metas))
+ cs1' = (map (applySubC s) cs1)
+ cs2' = (map (applySubC s) cs2)
+
+-- untouch = Set.fromList $ (map SMeta metas) ++ (map SVar tvars)
+-- (s', _) = Map.partitionWithKey (\subvar -> \_ -> Set.member subvar untouch) s

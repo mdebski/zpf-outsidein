@@ -39,3 +39,16 @@ data OIConstraint =
    CEq OIType OIType                                       -- t1 ~ t2
  | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]  -- [alphas] \forall betas Cs ⊃ Fs
  deriving (Eq, Show)
+
+fuv :: OIType -> [MetaVar]
+fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
+fuv (TCons _ ts) = concat (map fuv ts)
+fuv (TForall _ _ t) = fuv t
+fuv (TMeta m) = [m]
+fuv _ = []
+
+--worker :: OIType -> a
+--joiner :: a -> a -> a
+--
+--foldType :: OIType -> (worker) -> (joiner) -> a
+--foldType (TFun t1 t2) = joiner (worker t1) (worker t2)
