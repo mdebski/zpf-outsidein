@@ -70,7 +70,8 @@ generate (Case e epats) = do
  let fis' = concat fis
  return (beta, ef ++ [CEq et (TCons t alphas)] ++ fis')
 
-generate _ = undefined
+generate (Let name e1 e2) = do
+ undefined
 
 generatePat :: OIPat -> OIExpr -> ([TypeVar], [OIType]) -> OIType -> OI [OIConstraint]
 generatePat (PCon n ns) e (tvs, alphas) dec_et = do

@@ -1,6 +1,7 @@
 import OIDefs
 import OIMonad
 import ConGen
+import Solve
 
 stdlib :: OIExpr -> OIExpr
 stdlib = foldl (.) id

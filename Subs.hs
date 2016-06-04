@@ -11,6 +11,8 @@ type Sub = Map.Map SubVar OIType
 makeSub :: [SubVar] -> [OIType] -> Sub
 makeSub ss ts = Map.fromList $ zip ss ts
 
+emptySub = makeSub [] []
+
 applySub :: Sub -> OIType -> OIType
 applySub s (TFun t1 t2) = TFun (applySub s t1) (applySub s t2)
 applySub s (TCons n ts) = TCons n (map (applySub s) ts)
