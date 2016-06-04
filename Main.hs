@@ -14,25 +14,25 @@ stdlib = foldl (.) id
 
 expr1 :: OIExpr
 expr1 = Let "f1" (Lam "x" $ Case (Var "x")
- [ (PCon "T1" [PVar "n"], App (App (Var "cmp") (Var "n")) (ILit 0))
+ [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
  ]) (ILit 42)
 
 expr2 :: OIExpr
 expr2 = Let "f2" (Lam "x" $ Case (Var "x")
- [ (PCon "T1" [PVar "n"], App (App (Var "cmp") (Var "n")) (ILit 0))
- , (PCon "T2" [PVar "a"], (BLit True))
+ [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
+ , (PCon "T2" ["a"], (BLit True))
  ]) (ILit 42)
 
 expr3 :: OIExpr
 expr3 = Let "h1" (Lam "x" $ Lam "y" $ Case (Var "y")
- [ (PCon "T1" [PVar "n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
- , (PCon "T2" [PVar "a"], (BLit True))
+ [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
+ , (PCon "T2" ["a"], (BLit True))
  ]) (ILit 42)
 
 expr4 :: OIExpr
 expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
- [ (PCon "T1" [PVar "n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
- , (PCon "T2" [PVar "a"], App (Var "not") (Var "x"))
+ [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
+ , (PCon "T2" ["a"], App (Var "not") (Var "x"))
  ]) (ILit 42)
 
 main = print $ expr1

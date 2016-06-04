@@ -12,11 +12,14 @@ data OIExpr =
  | Let Name OIExpr OIExpr
  | LetA Name OIType OIExpr OIExpr
  | Case OIExpr [(OIPat, OIExpr)]
+ | LetD Name [TypeVar] [DCons] OIExpr
  deriving (Eq, Show)
 
-data OIPat =
-   PVar Name
- | PCon Name [OIPat]
+type DCons = (Name, [TypeVar], [OIConstraint], [OIType])
+
+-- only simple patterns: case x of [K x1 x2 ...]
+-- no nested, no _, no "other"
+data OIPat = PCon Name [Name]
  deriving (Eq, Show)
 
 type TypeVar = Int
@@ -33,6 +36,6 @@ data OIType =
  deriving (Eq, Show)
 
 data OIConstraint =
-   CEq OIType OIType
- | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]
+   CEq OIType OIType                                       -- t1 ~ t2
+ | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]  -- [alphas] \forall betas Cs ⊃ Fs
  deriving (Eq, Show)

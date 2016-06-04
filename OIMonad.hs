@@ -11,16 +11,29 @@ import OIDefs
 data OIState = OIState {
  nextVar :: Int,
  nextMeta :: Int,
- env :: Map.Map Name OIType,
- fuv :: [[MetaVar]]
+ envs :: [Map.Map Name OIType],
+ dcons :: Map.Map Name ([TypeVar], [OIConstraint], [OIType]),
+ tcons :: Map.Map Name ([TypeVar], [Name]),
+ d2t :: Map.Map Name Name -- data constructor name to type constructor name
 } deriving (Eq, Show)
+
+getTCon :: Name -> OI ([TypeVar], [Name])
+getTCon n = do
+ OIState{tcons=tcons} <- get
+ return $ tcons Map.! n
+getDCon :: Name -> OI ([TypeVar], [OIConstraint], [OIType])
+getDCon n = do
+ OIState{dcons=dcons} <- get
+ return $ dcons Map.! n
 
 baseState :: OIState
 baseState = OIState{
  nextVar = 100,
  nextMeta = 0,
- env = Map.empty,
- fuv = [[]]
+ envs = [Map.empty],
+ dcons = Map.empty,
+ tcons = Map.empty,
+ d2t = Map.empty
 }
 
 type OI = (StateT OIState) IO
@@ -33,27 +46,54 @@ freshVar = do
 
 freshMeta :: OI OIType
 freshMeta = do
- state@OIState{nextMeta=nextMeta,fuv=(f:fs)} <- get
- put state{nextMeta=nextMeta+1,fuv=((nextMeta:f):fs)}
+ state@OIState{nextMeta=nextMeta} <- get
+ put state{nextMeta=nextMeta+1}
  return $ TMeta nextMeta
+
+addData :: Name -> [TypeVar] -> [DCons] -> OI ()
+addData tname tvars newDcons = do
+ state@OIState{dcons=dcons, tcons=tcons, d2t=d2t} <- get
+ let dcons' = Map.fromList [(dname, (tvs, cs, ts)) | (dname, tvs, cs, ts) <- newDcons]
+ let dconsNames = Map.keys dcons'
+ let d2t' = Map.fromList [(dname, tname) | dname <- dconsNames]
+ put state{tcons=Map.insert tname (tvars, dconsNames) tcons,
+           dcons=Map.union dcons dcons',
+           d2t=Map.union d2t d2t'}
 
 getType :: Name -> OI OIType
 getType name = do
- OIState{env=env} <- get
- return $ env Map.! name
+ OIState{envs=envs} <- get
+ return $ (Map.unions envs) Map.! name
 
-withType :: Name -> OIType -> OI a -> OI a
-withType n t m = do
- state@OIState{env=env, fuv=fuv} <- get
- put state{env=Map.insert n t env, fuv=[]:fuv}
+withTypes :: [Name] -> [OIType] -> OI a -> OI a
+withTypes ns ts m = do
+ state@OIState{envs=envs} <- get
+ put state{envs=(Map.fromList (zip ns ts)):envs}
  res <- m
- put state{env=env, fuv=fuv}
+ put state{envs=envs}
  return res
 
-getFuv :: OI [MetaVar]
-getFuv = do
- OIState{fuv=fuv} <- get
- return $ concat fuv
+withType :: Name -> OIType -> OI a -> OI a
+withType n t = withTypes [n] [t]
 
 assert :: Bool -> OI ()
 assert b = void $ return $ Exc.assert b ()
+
+getEnvFuv :: OI [MetaVar]
+getEnvFuv = do
+ OIState{envs=envs} <- get
+ let env = Map.unions envs
+ return $ concatMap fuv (Map.elems env)
+
+fuv :: OIType -> [MetaVar]
+fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
+fuv (TCons _ ts) = concat (map fuv ts)
+fuv (TForall _ _ t) = fuv t
+fuv (TMeta m) = [m]
+fuv _ = []
+
+--worker :: OIType -> a
+--joiner :: a -> a -> a
+--
+--foldType :: OIType -> (worker) -> (joiner) -> a
+--foldType (TFun t1 t2) = joiner (worker t1) (worker t2)
