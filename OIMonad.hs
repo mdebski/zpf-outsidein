@@ -5,8 +5,8 @@ import qualified Data.Map as Map
 import qualified Control.Exception.Base as Exc
 import Control.Monad.Trans.State (StateT, put, get, runStateT)
 
-
 import OIDefs
+import Subs
 
 data OIState = OIState {
  nextVar :: Int,
@@ -40,11 +40,11 @@ type OI = (StateT OIState) IO
 runOI :: OI a -> IO (a, OIState)
 runOI m = runStateT m baseState
 
-freshVar :: OI OIType
+freshVar :: OI TypeVar
 freshVar = do
  state@OIState{nextVar=nextVar} <- get
  put state{nextVar = nextVar+1}
- return $ TVar nextVar
+ return nextVar
 
 freshMeta :: OI OIType
 freshMeta = do
@@ -81,8 +81,12 @@ withType n t = withTypes [n] [t]
 assert :: Bool -> OI ()
 assert b = void $ return $ Exc.assert b ()
 
-getEnvFuv :: OI [MetaVar]
-getEnvFuv = do
+getEnvFuvWithSub :: Sub -> OI [MetaVar]
+getEnvFuvWithSub s = do
  OIState{envs=envs} <- get
  let env = Map.unions envs
- return $ concatMap fuv (Map.elems env)
+ let ts = Map.elems env
+ return $ concatMap fuv (map (applySub s) ts)
+
+getEnvFuv :: OI [MetaVar]
+getEnvFuv = getEnvFuvWithSub emptySub

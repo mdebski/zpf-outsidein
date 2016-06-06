@@ -5,6 +5,8 @@ import Control.Monad
 import OIDefs
 import OIMonad
 import Subs
+import Solve
+import Data.List
 
 generate :: OIExpr -> OI (OIType, [OIConstraint])
 generate (ILit _) = return (TInt, [])
@@ -56,6 +58,23 @@ generate (LetA name dect e1 e2) = do
   _ -> return $ [CEq dect e1t] ++ e1f ++ e2f
  return (e2t, constrs)
 
+generate (Let name e1 e2) = do
+ alpha <- freshMeta
+ (tau, f1) <- withType name alpha $ generate e1
+ let f1' = (CEq alpha tau):f1
+ let fs = simpleConstraints f1'
+ phi <- solves fs
+ let betas = fuv (applySub phi tau)
+ envfuv <- getEnvFuvWithSub phi
+ let betas' = betas \\ envfuv
+ bs <- replicateM (length betas') freshVar
+ let theta = makeSub (map SMeta betas') (map TVar bs)
+ let tau' = applySub theta (applySub phi tau)
+ (ups, f2) <- withType name (TForall bs [] tau') $ generate e2
+ let f1'' = map (applySubC theta) f1'
+ envfuv <- getEnvFuv
+ return $ (ups, (CImp envfuv bs [] f1''):f2)
+
 generate (Case e epats) = do
  let (pats, es) = unzip epats
  let ts = map (\(PCon n _) -> n) pats
@@ -69,9 +88,6 @@ generate (Case e epats) = do
  fis <- sequence [generatePat pi ei (tvs, alphas) beta | (pi, ei) <- epats]
  let fis' = concat fis
  return (beta, ef ++ [CEq et (TCons t alphas)] ++ fis')
-
-generate (Let name e1 e2) = do
- undefined
 
 generatePat :: OIPat -> OIExpr -> ([TypeVar], [OIType]) -> OIType -> OI [OIConstraint]
 generatePat (PCon n ns) e (tvs, alphas) dec_et = do
