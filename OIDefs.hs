@@ -47,8 +47,9 @@ fuv (TForall _ _ t) = fuv t
 fuv (TMeta m) = [m]
 fuv _ = []
 
---worker :: OIType -> a
---joiner :: a -> a -> a
---
---foldType :: OIType -> (worker) -> (joiner) -> a
---foldType (TFun t1 t2) = joiner (worker t1) (worker t2)
+ftv :: OIType -> [MetaVar]
+ftv (TFun t1 t2) = (ftv t1) ++ (ftv t2)
+ftv (TCons _ ts) = concat (map ftv ts)
+ftv (TForall _ _ t) = ftv t
+ftv (TVar v) = [v]
+ftv _ = []

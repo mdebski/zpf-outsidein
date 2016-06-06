@@ -32,5 +32,8 @@ applySubC s (CImp metas tvars cs1 cs2) = CImp metas' tvars cs1' cs2' where
  cs1' = (map (applySubC s) cs1)
  cs2' = (map (applySubC s) cs2)
 
+domain :: Sub -> [SubVar]
+domain = Map.keys
+
 -- untouch = Set.fromList $ (map SMeta metas) ++ (map SVar tvars)
 -- (s', _) = Map.partitionWithKey (\subvar -> \_ -> Set.member subvar untouch) s
