@@ -16,9 +16,10 @@ data OIExpr =
  deriving (Eq, Show)
 
 type DCons = (Name, [TypeVar], [OIConstraint], [OIType])
+--            tname   bs          cons          arguments (tau_i)
 
 -- only simple patterns: case x of [K x1 x2 ...]
--- no nested, no _, no "other"
+-- no nested, no _, no "otherwise"
 data OIPat = PCon Name [Name]
  deriving (Eq, Show)
 

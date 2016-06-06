@@ -5,8 +5,12 @@ import Solve
 
 stdlib :: OIExpr -> OIExpr
 stdlib = foldl (.) id
-  -- Some standard functions, without real implementations, but with correct types.
-  [ LetA "neg" (TFun TInt TInt) $ Lam "_1" $ Var "_1"
+  -- Some types and standard functions, without real implementations, but with correct types.
+  [ LetD "T" [(-1)] [
+     ("T1", [], [CEq (TVar (-1)) TBool], [TInt]),
+     ("T2", [], [], [TVar (-1)])
+    ]
+  , LetA "neg" (TFun TInt TInt) $ Lam "_1" $ Var "_1"
   , LetA "not" (TFun TBool TBool) $ Lam "_2" $ Var "_2"
   , LetA "and" (TFun TBool (TFun TBool TBool)) $ Lam "_3" $ Lam "_4" $ Var "_4"
   , LetA "plus" (TFun TInt (TFun TInt TInt)) $ Lam "_5" $ Lam "_6" $ Var "_5"
@@ -39,6 +43,7 @@ expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
 
 main = do
  print expr1
- ((t, fs), state) <- runOI $ generate expr1
+ ((t, fs), state) <- runOI $ generate (stdlib expr1)
  print t
  print fs
+ print state

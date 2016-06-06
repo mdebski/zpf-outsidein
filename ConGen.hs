@@ -77,8 +77,9 @@ generate (Let name e1 e2) = do
 
 generate (Case e epats) = do
  let (pats, es) = unzip epats
- let ts = map (\(PCon n _) -> n) pats
- assert (ts /= [])
+ let ds = map (\(PCon n _) -> n) pats
+ assert (ds /= [])
+ ts <- mapM d2tCon ds
  let t = head ts
  assert (all (\x -> x == t) ts)
  (et, ef) <- generate e

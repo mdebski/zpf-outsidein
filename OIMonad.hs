@@ -20,11 +20,23 @@ data OIState = OIState {
 getTCon :: Name -> OI ([TypeVar], [Name])
 getTCon n = do
  OIState{tcons=tcons} <- get
- return $ tcons Map.! n
+ case Map.lookup n tcons of
+  Just x -> return x
+  Nothing -> error $ "Type constructor " ++ (show n) ++ " not found. Known: " ++ (show $ Map.keys tcons)
 getDCon :: Name -> OI ([TypeVar], [OIConstraint], [OIType])
 getDCon n = do
  OIState{dcons=dcons} <- get
- return $ dcons Map.! n
+ case Map.lookup n dcons of
+  Just x -> return x
+  Nothing -> error $ "Data constructor " ++ (show n) ++ " not found. Known: " ++ (show $ Map.keys dcons)
+
+d2tCon :: Name -> OI Name
+d2tCon n = do
+ OIState{d2t=d2t} <- get
+ case Map.lookup n d2t of
+  Just x -> return x
+  Nothing -> error $ "Missing type constructor for data constructor " ++ (show n) ++ ". Known: " ++ (show $ d2t)
+
 
 baseState :: OIState
 baseState = OIState{
