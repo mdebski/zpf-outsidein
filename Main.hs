@@ -16,11 +16,11 @@ stdlib = foldl (.) id
   , LetA "and" (TFun TBool (TFun TBool TBool)) $ Lam "_3" $ Lam "_4" $ Var "_4"
   , LetA "plus" (TFun TInt (TFun TInt TInt)) $ Lam "_5" $ Lam "_6" $ Var "_5"
   , LetA "cmp" (TFun TInt (TFun TInt TBool)) $ Lam "_7" $ Lam "_8" $ BLit True
-  , LetA "id" (TFun (TVar 1001) (TVar 1001)) $ Lam "_9" $ Var "_9"
+  , LetA "id" (TForall [1001] [] (TFun (TVar 1001) (TVar 1001))) $ Lam "_9" $ Var "_9"
   ]
 
 expr0 :: OIExpr
-expr0 = (Lam "x" $ (BLit True))
+expr0 = (App (Var "id") (Var "id"))
 
 expr1 :: OIExpr
 expr1 = Let "f1" (Lam "x" $ Case (Var "x")
@@ -46,4 +46,4 @@ expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- outsideIn (expr0)
+ outsideIn (stdlib expr0)

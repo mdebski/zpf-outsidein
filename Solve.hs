@@ -32,9 +32,9 @@ solves (c:cs) = do
 
 solve :: OIConstraint -> OI Sub
 solve c@(CEq t1 t2) = if (t1 == t2) then return emptySub else case (t1, t2) of
-  ((TVar v), t) -> return $ if typeMember (SVar v) t then error $ "Infinite type in CEq TVar: " ++ (show c) else makeSub [SVar v] [t]
   ((TMeta m), t) -> return $ if typeMember (SMeta m) t then error $ "Infinite type in CEq TMeta: " ++ (show c) else makeSub [SMeta m] [t]
   (t, x@(TMeta m)) -> solve (CEq x t)
+  ((TVar v), t) -> return $ if typeMember (SVar v) t then error $ "Infinite type in CEq TVar: " ++ (show c) else makeSub [SVar v] [t]
   (t, x@(TVar v)) -> solve (CEq x t)
   ((TFun t1 t2), (TFun t1' t2')) -> solves [CEq t1 t1', CEq t2 t2']
   ((TCons n ts1), (TCons m ts2)) -> do
