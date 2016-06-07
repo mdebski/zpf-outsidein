@@ -18,7 +18,7 @@ makeSub ss ts = Map.fromList $ zip ss ts
 emptySub = makeSub [] []
 
 applySub :: Sub -> OIType -> OIType
-applySub s (TFun t1 t2) = TFun (applySub s t1) (applySub s t2)
+applySub s (TFun t1 t2) = makeTFun (applySub s t1) (applySub s t2)
 applySub s (TCons n ts) = TCons n (map (applySub s) ts)
 applySub s (TForall a b t) = TForall a b (applySub s t)
 applySub s ot@(TMeta m) = case Map.lookup (SMeta m) s of

@@ -43,6 +43,10 @@ data OIConstraint =
  | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]  -- [alphas] \forall betas Cs ⊃ Fs
  deriving (Eq)
 
+makeTFun :: OIType -> OIType -> OIType
+makeTFun (TFun t1 t2) t3 = makeTFun t1 (makeTFun t2 t3)
+makeTFun t1 t2 = TFun t1 t2
+
 fuv :: OIType -> [MetaVar]
 fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
 fuv (TCons _ ts) = concat (map fuv ts)
