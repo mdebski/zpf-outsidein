@@ -76,7 +76,7 @@ addData tname tvars newDcons = do
            d2t=Map.union d2t d2t'}
  let dconsResType = TCons tname (map TVar tvars)
  let addTypeParams [] o = o
-     addTypeParams (t:ts) o = makeTFun t (addTypeParams ts o)
+     addTypeParams (t:ts) o = TFun t (addTypeParams ts o)
  let dconsTypes = [TForall (tvars++tvs) cs (addTypeParams ts dconsResType)
                    | (dname, tvs, cs, ts) <- newDcons]
  return (dconsNames, dconsTypes)

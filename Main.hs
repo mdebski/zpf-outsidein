@@ -39,6 +39,13 @@ expr2 :: OIExpr
 -- (3,True)
 expr2 = apps (Con "MkP") [ILit 3, BLit True]
 
+expr3 :: OIExpr
+-- (id, cmp)
+expr3 = apps (Con "MkP") [(Var "id"), (BLit True)]
+
+expr4 :: OIExpr
+expr4 = apps (Var "cmp") [ILit 1, ILit 2]
+
 expr01 :: OIExpr
 expr01 = apps (Con "MkP") [expr0, expr1]
 
@@ -66,4 +73,4 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- outsideIn (stdlib expr2)
+ outsideIn (stdlib expr3)
