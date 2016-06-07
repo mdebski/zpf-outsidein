@@ -91,6 +91,7 @@ getType name = do
 withTypes :: [Name] -> [OIType] -> OI a -> OI a
 withTypes ns ts m = do
  state@OIState{envs=envs} <- get
+ oiprint $ "withTypes: " ++ (show $ zip ns ts)
  put state{envs=(Map.fromList (zip ns ts)):envs}
  res <- m
  state <- get

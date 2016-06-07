@@ -69,8 +69,8 @@ _metas = ["α","β","γ","δ","ε","ζ","η","θ","ι","κ","λ","μ","ν","ξ",
 instance Show OIType where
  show (TInt) = "I"
  show (TBool) = "B"
- show (TFun t1 t2) = (show t1) ++ "→" ++ (show t2)
- show (TCons n ts) = n ++ " " ++ (intercalate " " $ map show ts)
+ show (TFun t1 t2) = "(" ++ (show t1) ++ "→" ++ (show t2) ++ ")"
+ show (TCons n ts) = "(" ++ n ++ " " ++ (intercalate " " $ map show ts) ++ ")"
  show (TVar v) = let v' = v-100 in if 0 <= v' && v' < length(_tvars) then _tvars !! v' else "v" ++ (show v)
  show (TMeta m) = if 0 <= m && m < length(_metas) then _metas !! m else "m" ++ (show m)
  show (TForall tvars cs t) = "∀" ++ (intercalate ", " $ map (show . TVar) tvars) ++ "." ++ (intercalate ", " $ map show cs) ++ " ⇒ " ++ (show t)

@@ -27,6 +27,8 @@ apps :: OIExpr -> [OIExpr] -> OIExpr
 apps f [] = f
 apps f (e:es) = apps (App f e) es
 
+mkp = apps (Con "MkP")
+
 expr0 :: OIExpr
 -- let id2 = \x -> x in id (id id2)
 expr0 = Let "id2" (Lam "x" (Var "x")) (App (App (Var "id") (Var "id")) (Var "id2"))
@@ -36,15 +38,16 @@ expr1 :: OIExpr
 expr1 = Let "g" ((Lam "x") (App (App (Var "and") (Var "x")) (BLit True))) (Var "g")
 
 expr2 :: OIExpr
--- (3,True)
-expr2 = apps (Con "MkP") [ILit 3, BLit True]
+expr2 = mkp [ILit 3, BLit True]
 
 expr3 :: OIExpr
--- (id, cmp)
-expr3 = apps (Con "MkP") [(Var "id"), (BLit True)]
+expr3 = mkp [(Var "id"), (BLit True)]
 
 expr4 :: OIExpr
 expr4 = apps (Var "cmp") [ILit 1, ILit 2]
+
+expr5 :: OIExpr
+expr5 = mkp [mkp [ILit 3, mkp [expr4,  ILit 4]], (Var "id")]
 
 expr01 :: OIExpr
 expr01 = apps (Con "MkP") [expr0, expr1]
@@ -73,4 +76,4 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- outsideIn (stdlib expr3)
+ outsideIn (stdlib expr5)
