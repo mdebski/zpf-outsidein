@@ -35,6 +35,10 @@ expr1 :: OIExpr
 -- let g = \x -> x && True in g
 expr1 = Let "g" ((Lam "x") (App (App (Var "and") (Var "x")) (BLit True))) (Var "g")
 
+expr2 :: OIExpr
+-- (3,True)
+expr2 = apps (Con "MkP") [ILit 3, BLit True]
+
 expr01 :: OIExpr
 expr01 = apps (Con "MkP") [expr0, expr1]
 
@@ -62,4 +66,4 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- outsideIn (stdlib expr01)
+ outsideIn (stdlib expr2)

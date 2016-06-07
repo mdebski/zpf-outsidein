@@ -45,7 +45,7 @@ generate (App e1 e2) = do
  (e1t, e1f) <- generate e1
  (e2t, e2f) <- generate e2
  alpha <- freshMeta
- return (alpha, [CEq e1t (makeTFun alpha e2t)] ++ e1f ++ e2f)
+ return (alpha, [CEq e1t (makeTFun e2t alpha)] ++ e1f ++ e2f)
 
 generate (LetA name dect e1 e2) = do
  (e1t, e1f) <- withType name dect $ generate e1
