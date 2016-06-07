@@ -40,6 +40,8 @@ solve c@(CEq (TCons n ts1) (TCons m ts2)) =
   if n == m && (length ts1) == (length ts2)
   then solves [CEq t1 t2 | (t1,t2) <- zip ts1 ts2]
   else error $ "Unsolvable S-Cons: " ++ (show c)
+solve c@(CEq t1 t2) = if t1 == t2 then return emptySub else
+  error $ "Unsolvable equality constraint: " ++ (show c)
 
 solve c@(CImp metas tvars [] fs) = do
  s <- solves fs
