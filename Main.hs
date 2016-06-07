@@ -19,6 +19,9 @@ stdlib = foldl (.) id
   , LetA "id" (TFun (TVar 1001) (TVar 1001)) $ Lam "_9" $ Var "_9"
   ]
 
+expr0 :: OIExpr
+expr0 = Let "f1" (Lam "x" $ (BLit True)) (Var "f1")
+
 expr1 :: OIExpr
 expr1 = Let "f1" (Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
@@ -43,8 +46,4 @@ expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- print expr1
- (t, (fs, state)) <- outsideIn (stdlib expr1)
- print t
- print fs
- print state
+ outsideIn (expr0)

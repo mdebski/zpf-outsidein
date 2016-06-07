@@ -60,7 +60,7 @@ ftv _ = []
 instance Show OIConstraint where
  show (CEq t1 t2) = (show t1) ++ " ~ " ++ (show t2)
  show (CImp metas tvars cs fs) = (show metas) ++ "∀"
-   ++ (show tvars) ++ "." ++ (intercalate ", " $ map show cs)
+   ++ (intercalate ", " $ map (show . TVar) tvars) ++ "." ++ (intercalate ", " $ map show cs)
    ++ " ⊃ " ++ (intercalate ", " $ map show fs)
 
 _tvars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -73,4 +73,4 @@ instance Show OIType where
  show (TCons n ts) = n ++ (intercalate " " $ map show ts)
  show (TVar v) = let v' = v-100 in if 0 <= v' && v' < length(_tvars) then _tvars !! v' else (show v)
  show (TMeta m) = if 0 <= m && m < length(_metas) then _metas !! m else (show m)
- show (TForall tvars cs t) = "∀" ++ (show tvars) ++ "." ++ (intercalate ", " $ map show cs) ++ " ⇒ " ++ (show t)
+ show (TForall tvars cs t) = "∀" ++ (intercalate ", " $ map (show . TVar) tvars) ++ "." ++ (intercalate ", " $ map show cs) ++ " ⇒ " ++ (show t)
