@@ -21,6 +21,7 @@ outsideIn e = do
   let t' = applySub s t
   oiprint $ "Pretype: " ++ (show t)
   oiprint $ "Type: " ++ (show t')
+  assertS ((fuv t') == []) "free unification variables in final type"
   return (t', fs)
  return (t, (fs, state))
 

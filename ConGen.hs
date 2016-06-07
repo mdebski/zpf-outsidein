@@ -93,7 +93,9 @@ generate (Case e epats) = do
 generatePat :: OIPat -> OIExpr -> ([TypeVar], [OIType]) -> OIType -> OI [OIConstraint]
 generatePat (PCon n ns) e (tvs, alphas) dec_et = do
  (bs, cons, ts) <- getDCon n
- -- TODO: \bar{b} \not\in ftv(gamma, dec_et)
+ envftv <- getEnvFtv
+ let ftvs = envftv ++ (ftv dec_et)
+ assert $ (intersect ftvs (bs)) == []
  assert $ (length ns) == (length ts)
  let phi = makeSub (map SVar tvs) alphas
  let ts' = map (applySub phi) ts

@@ -93,17 +93,26 @@ withType :: Name -> OIType -> OI a -> OI a
 withType n t = withTypes [n] [t]
 
 assert :: Bool -> OI ()
-assert b = void $ return $ Exc.assert b ()
+assert b = if b then return () else error "Assertion error"
 
-getEnvFuvWithSub :: Sub -> OI [MetaVar]
-getEnvFuvWithSub s = do
+assertS :: Bool -> String -> OI ()
+assertS b s = if b then return () else error $ "Assertion error: " ++ s
+
+envTypeMapWithSub :: (OIType -> [a]) -> Sub -> OI [a]
+envTypeMapWithSub f s = do
  OIState{envs=envs} <- get
  let env = Map.unions envs
  let ts = Map.elems env
- return $ concatMap fuv (map (applySub s) ts)
+ return $ concatMap f (map (applySub s) ts)
+
+getEnvFuvWithSub :: Sub -> OI [MetaVar]
+getEnvFuvWithSub = envTypeMapWithSub fuv
 
 getEnvFuv :: OI [MetaVar]
 getEnvFuv = getEnvFuvWithSub emptySub
+
+getEnvFtv :: OI [TypeVar]
+getEnvFtv = envTypeMapWithSub ftv emptySub
 
 oiprint :: String -> OI ()
 oiprint = lift . putStrLn
