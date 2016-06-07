@@ -20,30 +20,35 @@ stdlib = foldl (.) id
   ]
 
 expr0 :: OIExpr
-expr0 = (App (Var "id") (Var "id"))
+-- let id2 = \x -> x in id (id id2)
+expr0 = Let "id2" (Lam "x" (Var "x")) (App (App (Var "id") (Var "id")) (Var "id2"))
 
 expr1 :: OIExpr
-expr1 = Let "f1" (Lam "x" $ Case (Var "x")
+-- let g = \x -> x && True in g
+expr1 = Let "g" ((Lam "x") (App (App (Var "and") (Var "x")) (BLit True))) (Var "g")
+
+gadt_expr1 :: OIExpr
+gadt_expr1 = Let "f1" (Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
  ]) (ILit 42)
 
-expr2 :: OIExpr
-expr2 = Let "f2" (Lam "x" $ Case (Var "x")
+gadt_expr2 :: OIExpr
+gadt_expr2 = Let "f2" (Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
  , (PCon "T2" ["a"], (BLit True))
  ]) (ILit 42)
 
-expr3 :: OIExpr
-expr3 = Let "h1" (Lam "x" $ Lam "y" $ Case (Var "y")
+gadt_expr3 :: OIExpr
+gadt_expr3 = Let "h1" (Lam "x" $ Lam "y" $ Case (Var "y")
  [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
  , (PCon "T2" ["a"], (BLit True))
  ]) (ILit 42)
 
-expr4 :: OIExpr
-expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
+gadt_expr4 :: OIExpr
+gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
  , (PCon "T2" ["a"], App (Var "not") (Var "x"))
  ]) (ILit 42)
 
 main = do
- outsideIn (stdlib expr0)
+ outsideIn (stdlib expr1)
