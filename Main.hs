@@ -82,9 +82,5 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  , (PCon "T2" ["a"], App (Var "not") (Var "x"))
  ]) (Var "h2")
 
-gadt_expr5 :: OIExpr
-gadt_expr5 = Lam "x" $ Case (Var "x")
- [ (PCon "MkS" ["y", "z"], (apps (Var "cmpa") [(Var "y"), (Var "z")])) ]
-
 main = do
- outsideIn (stdlib gadt_expr5)
+ outsideIn (stdlib gadt_expr4)
