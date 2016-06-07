@@ -26,11 +26,12 @@ solves :: [OIConstraint] -> OI Sub
 solves [] = return $ emptySub
 solves (c:cs) = do
  s <- solve c
+ oiprint ("Solve " ++ (show c) ++ " = " ++ (show s))
  s' <- solves $ map (applySubC s) cs
  return $ compSub s s'
 
 solve :: OIConstraint -> OI Sub
-solve c@(CEq t1 t2) = case (t1, t2) of
+solve c@(CEq t1 t2) = if (t1 == t2) then return emptySub else case (t1, t2) of
   ((TVar v), t) -> return $ if typeMember (SVar v) t then error $ "Infinite type in CEq TVar: " ++ (show c) else makeSub [SVar v] [t]
   ((TMeta m), t) -> return $ if typeMember (SMeta m) t then error $ "Infinite type in CEq TMeta: " ++ (show c) else makeSub [SMeta m] [t]
   (t, x@(TMeta m)) -> solve (CEq x t)
@@ -40,7 +41,7 @@ solve c@(CEq t1 t2) = case (t1, t2) of
     if n == m && (length ts1) == (length ts2)
     then solves [CEq t1 t2 | (t1,t2) <- zip ts1 ts2]
     else error $ "Unsolvable S-Cons: " ++ (show c)
-  _ -> if t1 == t2 then return emptySub else error $ "Unsolvable equality constraint: " ++ (show c)
+  _ -> error $ "Unsolvable equality constraint: " ++ (show c)
 
 solve c@(CImp metas tvars [] fs) = do
  s <- solves fs

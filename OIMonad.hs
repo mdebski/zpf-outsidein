@@ -85,6 +85,7 @@ withTypes ns ts m = do
  state@OIState{envs=envs} <- get
  put state{envs=(Map.fromList (zip ns ts)):envs}
  res <- m
+ state <- get
  put state{envs=envs}
  return res
 
