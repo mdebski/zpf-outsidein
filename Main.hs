@@ -2,6 +2,7 @@ import OIDefs
 import OIMonad
 import ConGen
 import Solve
+import OutsideIn
 
 stdlib :: OIExpr -> OIExpr
 stdlib = foldl (.) id
@@ -43,7 +44,7 @@ expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
 
 main = do
  print expr1
- ((t, fs), state) <- runOI $ generate (stdlib expr1)
+ (t, (fs, state)) <- outsideIn (stdlib expr1)
  print t
  print fs
  print state
