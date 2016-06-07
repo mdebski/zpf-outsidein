@@ -7,12 +7,20 @@ import OIMonad
 import Subs
 
 simpleConstraints :: [OIConstraint] -> [OIConstraint]
-simpleConstraints = concatMap simpleConstraint
+simpleConstraints = concatMap (fst . splitConstraint)
+properConstraints :: [OIConstraint] -> [OIConstraint]
+properConstraints = concatMap (snd . splitConstraint)
+splitConstraints :: [OIConstraint] -> ([OIConstraint], [OIConstraint])
+splitConstraints cs =  (simpleConstraints cs, properConstraints cs)
 
-simpleConstraint :: OIConstraint -> [OIConstraint]
-simpleConstraint c@(CEq _ _) = [c]
-simpleConstraint (CImp m t [] cs) = [CImp m t [] (simpleConstraints cs)]
-simpleConstraint _ = []
+splitConstraint :: OIConstraint -> ([OIConstraint], [OIConstraint])
+splitConstraint c@(CEq _ _) = ([c], [])
+splitConstraint (CImp m t [] cs) = let (ss, ps) = unzip $ map splitConstraint cs
+                                       (s, p) = (concat ss, concat ps)
+ in ( if s /= [] then [CImp m t [] s] else []
+    , if p /= [] then [CImp m t [] p] else []
+ )
+splitConstraint c@(CImp m t cs fs) = ([], [c])
 
 typeMember :: SubVar -> OIType -> Bool
 typeMember v (TFun t1 t2) = (typeMember v t1) || (typeMember v t2)

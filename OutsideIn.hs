@@ -16,9 +16,10 @@ outsideIn e = do
   (t, fs) <- generate e
   oiprint $ "Constraints: "
   oiprint $ (intercalate "\n" (map show fs))
-  s1 <- solves (simpleConstraints fs)
+  let (ss, ps) = splitConstraints fs
+  s1 <- solves ss
   oiprint $ "Sub1: " ++ (show s1)
-  s2 <- solves (map (applySubC s1) fs)
+  s2 <- solves (map (applySubC s1) ps)
   oiprint $ "Sub2: " ++ (show s2)
   oiprint $ "Pretype: " ++ (show t)
   let t' = applySub s1 t
