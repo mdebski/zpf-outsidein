@@ -17,9 +17,9 @@ outsideIn e = do
   oiprint $ "Constraints: "
   oiprint $ (intercalate "\n" (map show fs))
   s <- solves fs
-  oiprint $ "Sub: "
-  oiprint $ (show s)
+  oiprint $ "Sub: " ++ (show s)
   let t' = applySub s t
+  oiprint $ "Pretype: " ++ (show t)
   oiprint $ "Type: " ++ (show t')
   return (t', fs)
  return (t, (fs, state))
