@@ -1,5 +1,7 @@
 module OIDefs where
 
+import Data.List
+
 type Name = String
 
 data OIExpr =
@@ -34,12 +36,12 @@ data OIType =
  | TVar TypeVar
  | TMeta MetaVar
  | TForall [TypeVar] [OIConstraint] OIType
- deriving (Eq, Show)
+ deriving (Eq)
 
 data OIConstraint =
    CEq OIType OIType                                       -- t1 ~ t2
  | CImp [MetaVar] [TypeVar] [OIConstraint] [OIConstraint]  -- [alphas] \forall betas Cs ⊃ Fs
- deriving (Eq, Show)
+ deriving (Eq)
 
 fuv :: OIType -> [MetaVar]
 fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
@@ -54,3 +56,21 @@ ftv (TCons _ ts) = concat (map ftv ts)
 ftv (TForall _ _ t) = ftv t
 ftv (TVar v) = [v]
 ftv _ = []
+
+instance Show OIConstraint where
+ show (CEq t1 t2) = (show t1) ++ " ~ " ++ (show t2)
+ show (CImp metas tvars cs fs) = (show metas) ++ "∀"
+   ++ (show tvars) ++ "." ++ (intercalate ", " $ map show cs)
+   ++ " ⊃ " ++ (intercalate ", " $ map show fs)
+
+_tvars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+_metas = ["α","β","γ","δ","ε","ζ","η","θ","ι","κ","λ","μ","ν","ξ","ο","π","ρ","ς","σ","τ","υ","φ","χ","ψ"]
+
+instance Show OIType where
+ show (TInt) = "I"
+ show (TBool) = "B"
+ show (TFun t1 t2) = (show t1) ++ "->" ++ (show t2)
+ show (TCons n ts) = n ++ (intercalate " " $ map show ts)
+ show (TVar v) = let v' = v-100 in if 0 <= v' && v' < length(_tvars) then _tvars !! v' else (show v)
+ show (TMeta m) = if 0 <= m && m < length(_metas) then _metas !! m else (show m)
+ show (TForall tvars cs t) = "∀" ++ (show tvars) ++ "." ++ (intercalate ", " $ map show cs) ++ " ⇒ " ++ (show t)
