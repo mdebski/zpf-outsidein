@@ -36,6 +36,9 @@ applySubC s (CImp metas tvars cs1 cs2) = CImp metas' tvars cs1' cs2' where
  cs1' = (map (applySubC s) cs1)
  cs2' = (map (applySubC s) cs2)
 
+compSub :: Sub -> Sub -> Sub
+compSub s1 s2 = Map.union s2 (Map.map (applySub s2) s1)
+
 domain :: Sub -> [SubVar]
 domain = Map.keys
 

@@ -26,22 +26,21 @@ solves :: [OIConstraint] -> OI Sub
 solves [] = return $ emptySub
 solves (c:cs) = do
  s <- solve c
- solves $ map (applySubC s) cs
+ s' <- solves $ map (applySubC s) cs
+ return $ compSub s s'
 
 solve :: OIConstraint -> OI Sub
-solve c@(CEq (TVar v) t) = return $ if typeMember (SVar v) t then
-  error $ "Infinite type in CEq TVar: " ++ (show c) else makeSub [SVar v] [t]
-solve c@(CEq (TMeta m) t) = return $ if typeMember (SMeta m) t then
-  error $ "Infinite type in CEq TMeta: " ++ (show c) else makeSub [SMeta m] [t]
-solve (CEq t x@(TMeta m)) = solve (CEq x t)
-solve (CEq t x@(TVar m)) = solve (CEq x t)
-solve (CEq (TFun t1 t2) (TFun t1' t2')) = solves [CEq t1 t1', CEq t2 t2']
-solve c@(CEq (TCons n ts1) (TCons m ts2)) =
-  if n == m && (length ts1) == (length ts2)
-  then solves [CEq t1 t2 | (t1,t2) <- zip ts1 ts2]
-  else error $ "Unsolvable S-Cons: " ++ (show c)
-solve c@(CEq t1 t2) = if t1 == t2 then return emptySub else
-  error $ "Unsolvable equality constraint: " ++ (show c)
+solve c@(CEq t1 t2) = case (t1, t2) of
+  ((TVar v), t) -> return $ if typeMember (SVar v) t then error $ "Infinite type in CEq TVar: " ++ (show c) else makeSub [SVar v] [t]
+  ((TMeta m), t) -> return $ if typeMember (SMeta m) t then error $ "Infinite type in CEq TMeta: " ++ (show c) else makeSub [SMeta m] [t]
+  (t, x@(TMeta m)) -> solve (CEq x t)
+  (t, x@(TVar v)) -> solve (CEq x t)
+  ((TFun t1 t2), (TFun t1' t2')) -> solves [CEq t1 t1', CEq t2 t2']
+  ((TCons n ts1), (TCons m ts2)) -> do
+    if n == m && (length ts1) == (length ts2)
+    then solves [CEq t1 t2 | (t1,t2) <- zip ts1 ts2]
+    else error $ "Unsolvable S-Cons: " ++ (show c)
+  _ -> if t1 == t2 then return emptySub else error $ "Unsolvable equality constraint: " ++ (show c)
 
 solve c@(CImp metas tvars [] fs) = do
  s <- solves fs
@@ -56,5 +55,3 @@ solve c@(CImp metas tvars cs fs) = do
  s2 <- solves fs'
  let ok = (intersect (map SMeta metas) (domain s2)) == []
  return $ if ok then s2 else error $ "Unsolvable S-PImpl: " ++ (show c)
-
-solve c = error $ "Unsolvable constraint: " ++ (show c)
