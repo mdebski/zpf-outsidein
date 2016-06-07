@@ -20,8 +20,10 @@ outsideIn e = do
   oiprint $ "Sub1: " ++ (show s1)
   s2 <- solves (map (applySubC s1) fs)
   oiprint $ "Sub2: " ++ (show s2)
-  let t' = applySub (compSub s1 s2) t
   oiprint $ "Pretype: " ++ (show t)
-  oiprint $ "Type: " ++ (show t')
+  let t' = applySub s1 t
+  oiprint $ "Type after s1: " ++ (show t')
+  let t'' = applySub s2 t'
+  oiprint $ "Type: " ++ (show t'')
   return (t', fs)
  return (t, (fs, state))
