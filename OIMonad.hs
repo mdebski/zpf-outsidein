@@ -65,7 +65,7 @@ freshMeta = do
  put state{nextMeta=nextMeta+1}
  return $ TMeta nextMeta
 
-addData :: Name -> [TypeVar] -> [DCons] -> OI ()
+addData :: Name -> [TypeVar] -> [DCons] -> OI ([String], [OIType])
 addData tname tvars newDcons = do
  state@OIState{dcons=dcons, tcons=tcons, d2t=d2t} <- get
  let dcons' = Map.fromList [(dname, (tvs, cs, ts)) | (dname, tvs, cs, ts) <- newDcons]
@@ -74,11 +74,19 @@ addData tname tvars newDcons = do
  put state{tcons=Map.insert tname (tvars, dconsNames) tcons,
            dcons=Map.union dcons dcons',
            d2t=Map.union d2t d2t'}
+ let dconsResType = TCons tname (map TVar tvars)
+ let addTypeParams [] o = o
+     addTypeParams (t:ts) o = makeTFun t (addTypeParams ts o)
+ let dconsTypes = [TForall (tvars++tvs) cs (addTypeParams ts dconsResType)
+                   | (dname, tvs, cs, ts) <- newDcons]
+ return (dconsNames, dconsTypes)
 
 getType :: Name -> OI OIType
 getType name = do
  OIState{envs=envs} <- get
- return $ (Map.unions envs) Map.! name
+ case Map.lookup name (Map.unions envs) of
+  Just x -> return x
+  Nothing -> error $ "Unknown identifier " ++ name
 
 withTypes :: [Name] -> [OIType] -> OI a -> OI a
 withTypes ns ts m = do

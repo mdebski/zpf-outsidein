@@ -11,6 +11,9 @@ stdlib = foldl (.) id
      ("T1", [], [CEq (TVar (-1)) TBool], [TInt]),
      ("T2", [], [], [TVar (-1)])
     ]
+  , LetD "Pair" [(-2), (-3)] [
+     ("MkP", [], [], [TVar (-2), TVar (-3)])
+    ]
   , LetA "neg" (TFun TInt TInt) $ Lam "_1" $ Var "_1"
   , LetA "not" (TFun TBool TBool) $ Lam "_2" $ Var "_2"
   , LetA "and" (TFun TBool (TFun TBool TBool)) $ Lam "_3" $ Lam "_4" $ Var "_4"
@@ -19,6 +22,11 @@ stdlib = foldl (.) id
   , LetA "id" (TForall [1001] [] (TFun (TVar 1001) (TVar 1001))) $ Lam "_9" $ Var "_9"
   ]
 
+apps :: OIExpr -> [OIExpr] -> OIExpr
+-- apply function to subsequent arguments
+apps f [] = f
+apps f (e:es) = apps (App f e) es
+
 expr0 :: OIExpr
 -- let id2 = \x -> x in id (id id2)
 expr0 = Let "id2" (Lam "x" (Var "x")) (App (App (Var "id") (Var "id")) (Var "id2"))
@@ -26,6 +34,9 @@ expr0 = Let "id2" (Lam "x" (Var "x")) (App (App (Var "id") (Var "id")) (Var "id2
 expr1 :: OIExpr
 -- let g = \x -> x && True in g
 expr1 = Let "g" ((Lam "x") (App (App (Var "and") (Var "x")) (BLit True))) (Var "g")
+
+expr01 :: OIExpr
+expr01 = apps (Con "MkP") [expr0, expr1]
 
 gadt_expr1 :: OIExpr
 gadt_expr1 = Let "f1" (Lam "x" $ Case (Var "x")
@@ -51,4 +62,4 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (ILit 42)
 
 main = do
- outsideIn (stdlib expr1)
+ outsideIn (stdlib expr01)

@@ -33,8 +33,8 @@ generate (Var name) = do
  return (nt, [])
 
 generate (LetD name vars dcons e) = do
- addData name vars dcons
- generate e
+ (ns, ts) <- addData name vars dcons
+ withTypes ns ts $ generate e
 
 generate (Lam name e) = do
  alpha <- freshMeta
