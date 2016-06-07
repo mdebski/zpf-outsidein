@@ -5,8 +5,12 @@ import qualified Data.Set as Set
 
 import OIDefs
 
-data SubVar = SVar TypeVar | SMeta MetaVar deriving (Eq, Ord, Show)
+data SubVar = SVar TypeVar | SMeta MetaVar deriving (Eq, Ord)
 type Sub = Map.Map SubVar OIType
+
+instance Show SubVar where
+ show (SVar x) = show $ TVar x
+ show (SMeta x) = show $ TMeta x
 
 makeSub :: [SubVar] -> [OIType] -> Sub
 makeSub ss ts = Map.fromList $ zip ss ts

@@ -3,6 +3,7 @@ module OIMonad where
 import Control.Monad
 import qualified Data.Map as Map
 import qualified Control.Exception.Base as Exc
+import Control.Monad.Trans.Class
 import Control.Monad.Trans.State (StateT, put, get, runStateT)
 
 import OIDefs
@@ -102,3 +103,6 @@ getEnvFuvWithSub s = do
 
 getEnvFuv :: OI [MetaVar]
 getEnvFuv = getEnvFuvWithSub emptySub
+
+oiprint :: String -> OI ()
+oiprint = lift . putStrLn
