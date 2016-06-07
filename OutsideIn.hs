@@ -16,12 +16,12 @@ outsideIn e = do
   (t, fs) <- generate e
   oiprint $ "Constraints: "
   oiprint $ (intercalate "\n" (map show fs))
-  s <- solves fs
-  oiprint $ "Sub: " ++ (show s)
-  let t' = applySub s t
+  s1 <- solves (simpleConstraints fs)
+  oiprint $ "Sub1: " ++ (show s1)
+  s2 <- solves (map (applySubC s1) fs)
+  oiprint $ "Sub2: " ++ (show s2)
+  let t' = applySub (compSub s1 s2) t
   oiprint $ "Pretype: " ++ (show t)
   oiprint $ "Type: " ++ (show t')
   return (t', fs)
  return (t, (fs, state))
-
-
