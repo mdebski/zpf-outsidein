@@ -20,7 +20,7 @@ stdlib = foldl (.) id
   ]
 
 expr0 :: OIExpr
-expr0 = Let "f1" (Lam "x" $ (BLit True)) (Var "f1")
+expr0 = (Lam "x" $ (BLit True))
 
 expr1 :: OIExpr
 expr1 = Let "f1" (Lam "x" $ Case (Var "x")
