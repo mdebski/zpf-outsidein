@@ -53,7 +53,7 @@ fuv _ = []
 ftv :: OIType -> [MetaVar]
 ftv (TFun t1 t2) = nub $ (ftv t1) ++ (ftv t2)
 ftv (TCons _ ts) = nub $ concat (map ftv ts)
-ftv (TForall _ _ t) = ftv t
+ftv (TForall tvs _ t) = (ftv t) \\ tvs
 ftv (TVar v) = [v]
 ftv _ = []
 

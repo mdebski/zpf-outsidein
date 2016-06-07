@@ -14,12 +14,16 @@ stdlib = foldl (.) id
   , LetD "Pair" [(-2), (-3)] [
      ("MkP", [], [], [TVar (-2), TVar (-3)])
     ]
+  , LetD "S" [] [
+     ("MkS", [(-4), (-5)], [CEq (TVar (-4)) (TVar (-5))], [TVar (-4), TVar (-5)])
+    ]
   , LetA "neg" (TFun TInt TInt) $ Lam "_1" $ Var "_1"
   , LetA "not" (TFun TBool TBool) $ Lam "_2" $ Var "_2"
   , LetA "and" (TFun TBool (TFun TBool TBool)) $ Lam "_3" $ Lam "_4" $ Var "_4"
   , LetA "plus" (TFun TInt (TFun TInt TInt)) $ Lam "_5" $ Lam "_6" $ Var "_5"
   , LetA "cmp" (TFun TInt (TFun TInt TBool)) $ Lam "_7" $ Lam "_8" $ BLit True
   , LetA "id" (TForall [1001] [] (TFun (TVar 1001) (TVar 1001))) $ Lam "_9" $ Var "_9"
+  , LetA "cmpa" (TForall [1002] [] (TFun (TVar 1002) (TFun (TVar 1002) TBool))) $ Lam "_10" $ Lam "_11" $ BLit False
   ]
 
 apps :: OIExpr -> [OIExpr] -> OIExpr
@@ -75,5 +79,9 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  , (PCon "T2" ["a"], App (Var "not") (Var "x"))
  ]) (Var "h2")
 
+gadt_expr5 :: OIExpr
+gadt_expr5 = Lam "x" $ Case (Var "x")
+ [ (PCon "MkS" ["y", "z"], (apps (Var "cmpa") [(Var "y"), (Var "z")])) ]
+
 main = do
- outsideIn (stdlib gadt_expr4)
+ outsideIn (stdlib gadt_expr5)

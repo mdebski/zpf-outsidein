@@ -96,8 +96,8 @@ generatePat (PCon n ns) e (tvs, alphas) dec_et = do
  (bs, cons, ts) <- getDCon n
  envftv <- getEnvFtv
  let ftvs = envftv ++ (ftv dec_et)
- assert $ (intersect ftvs (bs)) == []
- assert $ (length ns) == (length ts)
+ assertS ((intersect ftvs (bs)) == []) $ "Invalid pattern: duplicate type vars: " ++ (show ftvs) ++ " <=> " ++ (show bs)
+ assertS ((length ns) == (length ts)) "Invalid pattern: bad data constructor args count"
  let phi = makeSub (map SVar tvs) alphas
  let ts' = map (applySub phi) ts
  let cons' = map (applySubC phi) cons
