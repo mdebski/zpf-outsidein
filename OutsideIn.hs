@@ -14,12 +14,17 @@ outsideIn e = do
  ((t, fs), state) <- runOI $ do
   oiprint $ "Expr: " ++ (show e)
   (t, fs) <- generate e
-  oiprint $ "Constraints: "
-  oiprint $ (intercalate "\n" (map show fs))
   let (ss, ps) = splitConstraints fs
+  oiprint $ "Simple constraints: "
+  oiprint $ (intercalate "\n" (map show ss))
+  oiprint $ "Proper constraints: "
+  oiprint $ (intercalate "\n" (map show ps))
   s1 <- solves ss
   oiprint $ "Sub1: " ++ (show s1)
-  s2 <- solves (map (applySubC s1) ps)
+  let ps' = map (applySubC s1) ps
+  oiprint $ "Proper constraints after s1: "
+  oiprint $ (intercalate "\n" (map show ps'))
+  s2 <- solves ps'
   oiprint $ "Sub2: " ++ (show s2)
   oiprint $ "Pretype: " ++ (show t)
   let t' = applySub s1 t

@@ -45,7 +45,7 @@ generate (App e1 e2) = do
  (e1t, e1f) <- generate e1
  (e2t, e2f) <- generate e2
  alpha <- freshMeta
- oiprint $ "App: " ++ (show e1t) ++ " to " ++ (show e2t)
+ oiprint $ "App: " ++ (show e1t) ++ " to " ++ (show e2t) ++ " should give " ++ (show alpha)
  return (alpha, [CEq e1t (TFun e2t alpha)] ++ e1f ++ e2f)
 
 generate (LetA name dect e1 e2) = do

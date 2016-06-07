@@ -56,16 +56,19 @@ expr5 = mkp [mkp [ILit 3, mkp [expr4,  ILit 4]], (Var "id")]
 expr01 :: OIExpr
 expr01 = apps (Con "MkP") [expr0, expr1]
 
+gadt_expr1_simp :: OIExpr
+gadt_expr1_simp = (Lam "x" $ Case (Var "x")
+ [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0)) ])
 gadt_expr1 :: OIExpr
-gadt_expr1 = Let "f1" (Lam "x" $ Case (Var "x")
- [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
- ]) (Var "f1")
+gadt_expr1 = Let "f1" gadt_expr1_simp (Var "f1")
 
-gadt_expr2 :: OIExpr
-gadt_expr2 = Let "f2" (Lam "x" $ Case (Var "x")
+gadt_expr2_simp :: OIExpr
+gadt_expr2_simp = Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
  , (PCon "T2" ["a"], (BLit True))
- ]) (Var "f2")
+ ]
+gadt_expr2 :: OIExpr
+gadt_expr2 = Let "f2" gadt_expr2_simp (Var "f2")
 
 gadt_expr3 :: OIExpr
 gadt_expr3 = Let "h1" (Lam "x" $ Lam "y" $ Case (Var "y")

@@ -15,8 +15,7 @@ splitConstraints cs =  (simpleConstraints cs, properConstraints cs)
 
 splitConstraint :: OIConstraint -> ([OIConstraint], [OIConstraint])
 splitConstraint c@(CEq _ _) = ([c], [])
-splitConstraint (CImp m t [] cs) = let (ss, ps) = unzip $ map splitConstraint cs
-                                       (s, p) = (concat ss, concat ps)
+splitConstraint (CImp m t [] cs) = let (s, p) = splitConstraints cs
  in ( if s /= [] then [CImp m t [] s] else []
     , if p /= [] then [CImp m t [] p] else []
  )
@@ -29,6 +28,13 @@ typeMember v (TForall _ _ t) = typeMember v t
 typeMember (SMeta m) (TMeta m') = m == m'
 typeMember (SVar v) (TVar v') = v == v'
 typeMember _ _ = False
+
+solves2F :: [OIConstraint] -> OI Sub
+solves2F fs = do
+  let (ss, ps) = splitConstraints fs
+  s1 <- solves ss
+  s2 <- solves (map (applySubC s1) ps)
+  return $ compSub s1 s2
 
 solves :: [OIConstraint] -> OI Sub
 solves [] = return $ emptySub
@@ -61,6 +67,7 @@ solve c@(CImp metas tvars [] fs) = do
 solve c@(CImp metas tvars cs fs) = do
  s1 <- solves cs
  let fs' = map (applySubC s1) fs
- s2 <- solves fs'
+ s2 <- solves2F fs'
+ oiprint $ show s2
  let ok = (intersect (map SMeta metas) (domain s2)) == []
  return $ if ok then s2 else error $ "Unsolvable S-PImpl: " ++ (show c)
