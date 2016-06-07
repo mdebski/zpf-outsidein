@@ -1,5 +1,6 @@
 module Subs where
 
+import Data.List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 
@@ -32,7 +33,7 @@ applySub s t = t
 applySubC :: Sub -> OIConstraint -> OIConstraint
 applySubC s (CEq t1 t2) = CEq (applySub s t1) (applySub s t2)
 applySubC s (CImp metas tvars cs1 cs2) = CImp metas' tvars cs1' cs2' where
- metas' = concatMap fuv (map (applySub s) (map TMeta metas))
+ metas' = nub $ concatMap fuv (map (applySub s) (map TMeta metas))
  cs1' = (map (applySubC s) cs1)
  cs2' = (map (applySubC s) cs2)
 

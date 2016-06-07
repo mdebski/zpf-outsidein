@@ -44,24 +44,25 @@ data OIConstraint =
  deriving (Eq)
 
 fuv :: OIType -> [MetaVar]
-fuv (TFun t1 t2) = (fuv t1) ++ (fuv t2)
-fuv (TCons _ ts) = concat (map fuv ts)
+fuv (TFun t1 t2) = nub $ (fuv t1) ++ (fuv t2)
+fuv (TCons _ ts) = nub $ concat (map fuv ts)
 fuv (TForall _ _ t) = fuv t
 fuv (TMeta m) = [m]
 fuv _ = []
 
 ftv :: OIType -> [MetaVar]
-ftv (TFun t1 t2) = (ftv t1) ++ (ftv t2)
-ftv (TCons _ ts) = concat (map ftv ts)
+ftv (TFun t1 t2) = nub $ (ftv t1) ++ (ftv t2)
+ftv (TCons _ ts) = nub $ concat (map ftv ts)
 ftv (TForall _ _ t) = ftv t
 ftv (TVar v) = [v]
 ftv _ = []
 
 instance Show OIConstraint where
  show (CEq t1 t2) = (show t1) ++ " ~ " ++ (show t2)
- show (CImp metas tvars cs fs) = (show metas) ++ "∀"
-   ++ (intercalate ", " $ map (show . TVar) tvars) ++ "." ++ (intercalate ", " $ map show cs)
-   ++ " ⊃ " ++ (intercalate ", " $ map show fs)
+ show (CImp metas tvars cs fs) = "{" ++ (intercalate ", " $ map (show . TMeta) metas) ++ "}"
+   ++ "∀" ++ (intercalate ", " $ map (show . TVar) tvars) ++ "."
+   ++ (intercalate ", " $ map show cs) ++ " ⊃ "
+   ++ (intercalate ", " $ map show fs)
 
 _tvars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 _metas = ["α","β","γ","δ","ε","ζ","η","θ","ι","κ","λ","μ","ν","ξ","ο","π","ρ","ς","σ","τ","υ","φ","χ","ψ"]

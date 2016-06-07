@@ -103,5 +103,5 @@ generatePat (PCon n ns) e (tvs, alphas) dec_et = do
  let cons' = map (applySubC phi) cons
  (et, ef) <- withTypes ns ts' $ generate e
  envfuv <- getEnvFuv
- let fuvs = envfuv ++ (concatMap fuv alphas) ++ (fuv dec_et)
+ let fuvs = nub $ envfuv ++ (concatMap fuv alphas) ++ (fuv dec_et)
  return $ [CImp fuvs bs cons' ((CEq et dec_et):ef)]
