@@ -39,13 +39,13 @@ generate (LetD name vars dcons e) = do
 generate (Lam name e) = do
  alpha <- freshMeta
  (et, econstr) <- withType name alpha (generate e)
- return (makeTFun alpha et, econstr)
+ return (TFun alpha et, econstr)
 
 generate (App e1 e2) = do
  (e1t, e1f) <- generate e1
  (e2t, e2f) <- generate e2
  alpha <- freshMeta
- return (alpha, [CEq e1t (makeTFun e2t alpha)] ++ e1f ++ e2f)
+ return (alpha, [CEq e1t (TFun e2t alpha)] ++ e1f ++ e2f)
 
 generate (LetA name dect e1 e2) = do
  (e1t, e1f) <- withType name dect $ generate e1
