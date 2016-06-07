@@ -55,25 +55,25 @@ expr01 = apps (Con "MkP") [expr0, expr1]
 gadt_expr1 :: OIExpr
 gadt_expr1 = Let "f1" (Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
- ]) (ILit 42)
+ ]) (Var "f1")
 
 gadt_expr2 :: OIExpr
 gadt_expr2 = Let "f2" (Lam "x" $ Case (Var "x")
  [ (PCon "T1" ["n"], App (App (Var "cmp") (Var "n")) (ILit 0))
  , (PCon "T2" ["a"], (BLit True))
- ]) (ILit 42)
+ ]) (Var "f2")
 
 gadt_expr3 :: OIExpr
 gadt_expr3 = Let "h1" (Lam "x" $ Lam "y" $ Case (Var "y")
  [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
  , (PCon "T2" ["a"], (BLit True))
- ]) (ILit 42)
+ ]) (Var "h1")
 
 gadt_expr4 :: OIExpr
 gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  [ (PCon "T1" ["n"], App (App (Var "and") (Var "x")) (App (App (Var "cmp") (Var "n")) (ILit 0)))
  , (PCon "T2" ["a"], App (Var "not") (Var "x"))
- ]) (ILit 42)
+ ]) (Var "h2")
 
 main = do
- outsideIn (stdlib expr5)
+ outsideIn (stdlib gadt_expr4)
