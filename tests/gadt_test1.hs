@@ -23,5 +23,5 @@ main = do
         (Lam "e" $ Case (Var "e") [(PCon "Lit" ["n"], (ILit 4))]) $
           LetA "size1" (TForall [(-2)] [] $ TFun (TCons "Exp" [TVar (-2)]) (TVar (-2)))
             (Lam "e" $ Case (Var "e") [(PCon "Lit" ["n"], (ILit 4))]) $
-              (Var "size1")
+              (Var "size")
 

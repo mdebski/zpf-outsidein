@@ -3,6 +3,8 @@ import OIMonad
 import ConGen
 import Solve
 import OutsideIn
+import Control.Exception
+import Control.Monad
 
 stdlib :: OIExpr -> OIExpr
 stdlib = foldl (.) id
@@ -83,4 +85,13 @@ gadt_expr4 = Let "h2" (Lam "x" $ Lam "y" $ Case (Var "y")
  ]) (Var "h2")
 
 main = do
+ putStrLn "==================== simple ==================="
+ outsideIn (stdlib expr01)
+ putStrLn "==================== f1 (FAILS) ==================="
+ catch (void $ outsideIn (stdlib gadt_expr1)) (\e -> putStrLn $ "FAILED: " ++ (show (e::SomeException)))
+ putStrLn "==================== f2 ==================="
+ outsideIn (stdlib gadt_expr2)
+ putStrLn "==================== h1 (FAILS) ==================="
+ catch (void $ outsideIn (stdlib gadt_expr3)) (\e -> putStrLn $ "FAILED: " ++ (show (e::SomeException)))
+ putStrLn "==================== h2 ==================="
  outsideIn (stdlib gadt_expr4)
