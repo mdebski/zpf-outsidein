@@ -24,8 +24,8 @@ stdlib = foldl (.) id
   , LetA "and" (TFun TBool (TFun TBool TBool)) $ Lam "_3" $ Lam "_4" $ Var "_4"
   , LetA "plus" (TFun TInt (TFun TInt TInt)) $ Lam "_5" $ Lam "_6" $ Var "_5"
   , LetA "cmp" (TFun TInt (TFun TInt TBool)) $ Lam "_7" $ Lam "_8" $ BLit True
-  , LetA "id" (TForall [1001] [] (TFun (TVar 1001) (TVar 1001))) $ Lam "_9" $ Var "_9"
-  , LetA "cmpa" (TForall [1002] [] (TFun (TVar 1002) (TFun (TVar 1002) TBool))) $ Lam "_10" $ Lam "_11" $ BLit False
+  , LetA "id" (TForall [(-11)] [] (TFun (TVar (-11)) (TVar (-11)))) $ Lam "_9" $ Var "_9"
+  , LetA "cmpa" (TForall [(-12)] [] (TFun (TVar (-12)) (TFun (TVar (-12)) TBool))) $ Lam "_10" $ Lam "_11" $ BLit False
   ]
 
 apps :: OIExpr -> [OIExpr] -> OIExpr
